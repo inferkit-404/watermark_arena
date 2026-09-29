@@ -1,0 +1,10 @@
+# WatermarkGuard-Image 评测后端依赖
+# 必需依赖
+numpy>=1.20
+scipy>=1.7
+pyyaml>=5.4
+
+# 可选依赖（缺失时相关功能优雅降级，不阻塞主流程）
+Pillow>=8.0          # 基线攻击 A0 的 JPEG 编解码 + 从目录读取真实图片
+lpips>=0.1.4         # §9 LPIPS 感知质量指标
+torch>=1.8           # lpips 依赖

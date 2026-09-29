@@ -1,0 +1,45 @@
+# WatermarkGuard-Image 攻防对抗评测后端配置
+# 所有路径相对于本文件所在目录；运行时亦可由 CLI 参数覆盖。
+
+image:
+  width: 512
+  height: 512
+  channels: 3
+  dtype: uint8
+
+evaluation:
+  n_samples: 64            # 每个攻防组合采样的原图数量
+  seed: 0                  # 数据生成/采样随机种子
+  data_source: null        # null=程序化合成测试图；或填写图片目录路径
+  shuffle_pairs: true      # 正负分支独立调用攻击（攻击始终不接收标签）
+
+# §9 质量约束（建议硬约束）。strict=true 时质量不达标视为非法，触发 §9.6 替换逻辑。
+quality:
+  strict: true
+  embed:                   # §9.2 嵌入质量
+    ssim_min: 0.97
+    psnr_min: 36.0
+    lpips_max: 0.06
+  attack:                  # §9.3 攻击质量
+    ssim_min: 0.92
+    psnr_min: 28.0
+    lpips_max: 0.15
+  joint:                   # §9.3 联合质量（攻击后图 vs 原始图），仅报告，不触发替换
+    ssim_min: 0.85
+
+# §11 第一阶段资格门槛（仅资格筛选，不计入第二阶段平均分）
+qualification:
+  attack:
+    success_rate_min: 0.99     # 程序成功率
+    legal_rate_min: 0.95       # 合法攻击率
+    delta_a: 0.02              # AUC(A_a, D0) <= AUC(Id, D0) - delta_a
+  defense:
+    embed_success_min: 0.99
+    embed_quality_rate_min: 0.95
+    detect_success_min: 0.99
+    clean_auc_min: 0.90
+    robust_auc_min: 0.60       # A0 攻击后 AUC
+
+report:
+  out_dir: ./results
+  color: true              # 控制台热力图是否启用 ANSI 颜色
